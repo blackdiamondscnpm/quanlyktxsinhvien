@@ -563,6 +563,59 @@
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('collapsed');
+            updateActivityTime();
+        }
+
+        // Kiểm tra session khi trang load
+        window.addEventListener('load', function() {
+            if (!validateSession()) {
+                window.location.href = 'index.html';
+            }
+            // Lắng nghe sự kiện người dùng tương tác để update activity time
+            document.addEventListener('click', updateActivityTime);
+            document.addEventListener('keypress', updateActivityTime);
+        });
+
+        // Hàm kiểm tra session hợp lệ
+        function validateSession() {
+            const sessionToken = localStorage.getItem('sessionToken');
+            const sessionLastActivity = localStorage.getItem('sessionLastActivity');
+            
+            // Nếu không có session -> không hợp lệ
+            if (!sessionToken) {
+                return false;
+            }
+            
+            // Kiểm tra timeout (10 phút = 600000 ms)
+            const currentTime = Date.now();
+            const lastActivityTime = parseInt(sessionLastActivity);
+            const timeoutDuration = 10 * 60 * 1000; // 10 phút
+            
+            if (currentTime - lastActivityTime > timeoutDuration) {
+                // Session expired -> xóa session
+                logout();
+                return false;
+            }
+            
+            // Session còn hợp lệ
+            return true;
+        }
+
+        // Hàm update activity time (khi user có tương tác)
+        function updateActivityTime() {
+            const sessionToken = localStorage.getItem('sessionToken');
+            if (sessionToken) {
+                localStorage.setItem('sessionLastActivity', Date.now());
+            }
+        }
+
+        // Xóa session khi logout
+        function logout() {
+            localStorage.removeItem('sessionToken');
+            localStorage.removeItem('sessionUsername');
+            localStorage.removeItem('sessionStart');
+            localStorage.removeItem('sessionLastActivity');
+            window.location.href = "index.html";
         }
     </script>
 
