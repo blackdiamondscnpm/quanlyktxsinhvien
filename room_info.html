@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thông tin phòng - PTIT</title>
     <style>
-        /* --- COPY LẠI CSS TỪ FILE ADMIN.HTML (GIỮ NGUYÊN) --- */
         * { box-sizing: border-box; }
         body { margin: 0; font-family: Arial, sans-serif; background-color: #fff5f5; height: 100vh; display: flex; flex-direction: column; }
         
@@ -17,174 +16,132 @@
         
         .sidebar { width: 300px; background-color: white; border-right: 2px solid #ff3333; display: flex; flex-direction: column; padding: 20px 0; overflow: hidden; transition: width 0.3s ease, border 0.3s ease; flex-shrink: 0; }
         .sidebar.collapsed { width: 0; border: none; }
-        .menu-list { flex: 1; padding: 0 20px; }
-        .menu-item { padding: 15px 0; border-bottom: 2px solid #ffcccc; color: #ff3333; font-size: 18px; cursor: pointer; display: flex; align-items: center; gap: 10px; text-decoration: none; /* Thêm để bỏ gạch chân link */ }
+        .menu-list { flex: 1; padding: 0 20px; overflow-y: auto; }
+        
+        .menu-section-title { color: #ff3333; font-weight: bold; font-size: 16px; margin-top: 15px; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .menu-section-title:hover { color: #cc0000; }
+        
+        .menu-item { padding: 12px 0 12px 20px; border-bottom: 2px solid #ffcccc; color: #ff3333; font-size: 16px; cursor: pointer; display: flex; align-items: center; text-decoration: none; transition: color 0.3s; }
         .menu-item:hover { color: #cc0000; }
         .menu-item.active { font-weight: bold; }
         
-        .sidebar-footer { padding: 20px; display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .sidebar-footer { padding: 20px; display: flex; align-items: center; gap: 10px; }
         .footer-logo { width: 50px; height: auto; }
         .footer-text { font-size: 10px; font-weight: bold; color: #cc3333; text-transform: uppercase; line-height: 1.3; }
         
-        .main-content { flex: 1; padding: 40px; overflow-y: auto; transition: flex 0.3s ease; }
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
 
-        /* --- CSS RIÊNG CHO TRANG THÔNG TIN PHÒNG --- */
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; gap: 20px; }
         
-        /* Tiêu đề "Phòng J01" */
         .room-title {
             color: #ff3333;
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
-            margin-bottom: 15px;
-            margin-top: 0;
+            margin: 0;
         }
 
-        /* Chữ "Thành viên:" */
-        .sub-label {
-            color: #ff3333;
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-
-        /* Khung chữ nhật lớn (Members Box) */
-        .member-box {
+        .search-edit-wrapper { display: flex; gap: 15px; align-items: center; }
+        
+        .search-box {
             border: 2px solid #ff3333;
-            background-color: #fff0f0;
-            height: 250px; /* Chiều cao cố định giống ảnh */
-            width: 100%;
-            margin-bottom: 40px;
-        }
-
-        /* Lưới hiển thị thông tin điện nước (3 cột) */
-        .utility-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr; /* Chia 3 cột đều nhau */
-            row-gap: 20px; /* Khoảng cách giữa các dòng */
-            color: #ff3333;
-            font-size: 16px;
-        }
-
-        /* Dòng tổng tiền căn giữa */
-        .total-price {
-            text-align: center;
-            color: #ff3333;
-            font-size: 20px;
-            margin-top: 40px;
-        }
-
-        /* CSS cho danh sách thành viên */
-        .member-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            padding: 15px;
-            align-content: flex-start;
-        }
-
-        .member-item {
-            background-color: white;
-            border: 1px solid #ff9999;
-            padding: 10px 15px;
             border-radius: 20px;
+            padding: 12px 20px;
+            font-size: 14px;
             color: #ff3333;
+            min-width: 250px;
+            background-color: white;
+        }
+
+        .search-box::placeholder {
+            color: #ff9999;
+        }
+
+        .btn-edit {
+            background-color: transparent;
+            color: #ff3333;
+            border: 2px solid #ff3333;
+            padding: 10px 30px;
+            border-radius: 20px;
             cursor: pointer;
             font-weight: bold;
             font-size: 14px;
             transition: all 0.3s;
         }
 
-        .member-item:hover {
+        .btn-edit:hover {
             background-color: #ff3333;
             color: white;
-            transform: scale(1.05);
         }
 
-        .member-item.delete-mode {
-            border: 2px solid #ff3333;
-            background-color: #fff0f0;
-        }
-
-        .member-item.delete-mode:hover {
-            background-color: #ffcccc;
-            color: #ff3333;
-        }
-
-        .member-name {
-            flex: 1;
-        }
-
-        .btn-delete-member {
-            background-color: transparent;
-            color: inherit;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: bold;
-            padding: 0;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.2s;
+        .members-label {
             display: none;
+            color: #ff3333;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 20px 0 15px 0;
         }
 
-        .btn-delete-member:hover {
-            transform: scale(1.3);
+        .member-buttons {
+            display: none;
+            gap: 10px;
+            margin-bottom: 15px;
         }
 
-        /* Nút thêm sinh viên */
-        .btn-add-member, .btn-delete-member-modal {
+        .btn-add-member, .btn-delete-member {
             background-color: #ff3333;
             color: white;
             border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
+            padding: 10px 20px;
+            border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
             font-size: 14px;
             transition: background-color 0.3s;
-            margin-right: 10px;
         }
 
-        .btn-add-member:hover, .btn-delete-member-modal:hover {
+        .btn-add-member:hover, .btn-delete-member:hover {
             background-color: #cc0000;
         }
 
-        /* CSS cho dropdown chọn phòng */
-        .room-selector {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            padding: 0 15px;
-        }
-
-        .room-selector label {
-            color: #ff3333;
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .room-selector select {
-            padding: 8px 15px;
-            border: 2px solid #ff3333;
-            border-radius: 5px;
+        table {
+            width: 100%;
+            border-collapse: collapse;
             background-color: white;
+        }
+
+        table th {
+            background-color: transparent;
             color: #ff3333;
             font-weight: bold;
+            font-size: 15px;
+            padding: 15px;
+            text-align: left;
+            border: 2px solid #ff3333;
+            border-bottom: 2px solid #ff3333;
+        }
+
+        table td {
+            padding: 15px;
+            border: 2px solid #ff3333;
+            color: #333;
             font-size: 14px;
+        }
+
+        table tr:hover {
+            background-color: #fff9f9;
+        }
+
+        .link-see {
+            color: #ff3333;
+            text-decoration: underline;
             cursor: pointer;
-            min-width: 150px;
         }
 
-        .room-selector select:focus {
-            outline: none;
-            background-color: #fff0f0;
+        .link-see:hover {
+            color: #cc0000;
         }
 
-        /* CSS cho modal/dialog thêm sinh viên */
+        /* Modal styles */
         .modal {
             display: none;
             position: fixed;
@@ -256,6 +213,170 @@
             background-color: #999;
         }
 
+        .delete-checkbox {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .delete-checkbox label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            color: #ff3333;
+            cursor: pointer;
+        }
+
+        .delete-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        /* Edit Member Modal Styles */
+        .edit-modal-content {
+            width: 700px;
+            max-width: 90%;
+        }
+
+        .edit-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ff3333;
+        }
+
+        .edit-tab-btn {
+            flex: 1;
+            padding: 12px;
+            background-color: #fff5f5;
+            color: #ff3333;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .edit-tab-btn.active {
+            background-color: white;
+            border-bottom: 3px solid #ff3333;
+        }
+
+        .edit-tab-btn:hover {
+            background-color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .add-member-section, .delete-member-section {
+            padding: 20px 0;
+        }
+
+        .add-member-section input {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ff9999;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        .add-member-section select {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ff9999;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 14px;
+            color: #ff3333;
+            background-color: white;
+            cursor: pointer;
+        }
+
+        .add-member-section label {
+            display: block;
+            color: #ff3333;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .delete-member-list {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #ffcccc;
+            border-radius: 5px;
+            background-color: #fff9f9;
+        }
+
+        .delete-member-list label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            color: #ff3333;
+            cursor: pointer;
+        }
+
+        .delete-member-list input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .room-card {
+            background: white;
+            border: 2px solid #ff3333;
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .room-card:hover {
+            background-color: #fff5f5;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(255, 51, 51, 0.2);
+        }
+
+        .room-card-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff3333;
+            margin-bottom: 10px;
+        }
+
+        .room-card-info {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
     </style>
 </head>
 <body>
@@ -272,11 +393,21 @@
         
         <div class="sidebar" id="sidebar">
             <div class="menu-list">
-                <a href="home.html" class="menu-item"><span>🏠</span> Trang chủ</a>
+                <a href="home.html" class="menu-item">🏠 Trang chủ</a>
+                <a href="room_info.html?view=overview" class="menu-item" onclick="showOverviewHandler(event)">📋 Thông tin phòng</a>
                 
-                <a href="room_info.html" class="menu-item active">Thông tin phòng</a>
+                <div class="menu-section-title" onclick="toggleSection(this)">▶ Khu A</div>
+                <div class="menu-subsection" style="display: none;">
+                    <a href="room_info.html" class="menu-item" data-room="A1">Phòng A1</a>
+                    <a href="room_info.html" class="menu-item" data-room="A2">Phòng A2</a>
+                </div>
+
+                <div class="menu-section-title" onclick="toggleSection(this)">▶ Khu B</div>
+                <div class="menu-subsection" style="display: none;">
+                    <a href="room_info.html" class="menu-item" data-room="B1">Phòng B1</a>
+                    <a href="room_info.html" class="menu-item" data-room="B2">Phòng B2</a>
+                </div>
                 
-                <a href="profile.html" class="menu-item">Thông tin cá nhân</a>
                 <a href="#" class="menu-item">Hỗ trợ</a>
             </div>
 
@@ -291,74 +422,82 @@
 
         <div class="main-content">
             
-            <h2 class="room-title">Thông tin phòng</h2>
-            
-            <div class="room-selector">
-                <label for="roomSelect">Chọn phòng:</label>
-                <select id="roomSelect" onchange="loadRoom(this.value)">
-                    <option value="">----</option>
-                    <option value="J01">Phòng J01</option>
-                    <option value="J02">Phòng J02</option>
-                </select>
-            </div>
-            
-            <div class="sub-label" id="memberLabel" style="display: none;">Thành viên:</div>
-            
-            <div class="member-box" id="memberBox" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 15px;">
-                    <button class="btn-add-member" onclick="openAddMemberModal()">+ Thêm sinh viên</button>
-                    <button class="btn-delete-member-modal" onclick="openDeleteMemberModal()" id="toggleDeleteBtn">- Xóa sinh viên</button>
-                </div>
-                <div class="member-list" id="memberList">
-                    <div class="member-item" data-code="N23DCVT001" data-name="Nguyen Van A" data-bed="G5" onclick="handleMemberClick('N23DCVT001', 'Nguyen Van A', 'J01', 'G5', 'Đã đóng tiền')">
-                        Nguyen Van A
-                    </div>
-                    <div class="member-item" data-code="N23DCVT002" data-name="Nguyen Van B" data-bed="G6" onclick="handleMemberClick('N23DCVT002', 'Nguyen Van B', 'J01', 'G6', 'Đã đóng tiền')">
-                        Nguyen Van B
-                    </div>
+            <div class="page-header">
+                <h1 class="room-title" id="roomTitle">📋 Thông tin phòng</h1>
+                <div class="search-edit-wrapper" id="searchEditWrapper" style="display: none;">
+                    <input type="text" class="search-box" placeholder="Tìm kiếm..." id="searchInput" onkeyup="filterTable()">
+                    <button class="btn-edit" onclick="openEditModal()">Chỉnh sửa</button>
                 </div>
             </div>
-
-            <div class="utility-grid" id="utilityGrid" style="display: none;">
-                <div>Số điện cũ: xx (16/06/2026)</div>
-                <div>Số điện hiện tại: xx</div>
-                <div>Đơn giá: 3500 / kwh</div>
-
-                <div>Số nước cũ : xx (16/06/2026)</div>
-                <div>Số nước hiện tại: xx</div>
-                <div>Đơn giá: 15000VNĐ / khối</div>
-            </div>
-
-            <div class="total-price" id="totalPrice" style="display: none;">
-                Tổng tiền: xx
+            
+            <div id="overviewContainer" class="overview-grid"></div>
+            
+            <div id="roomDetailContainer" style="display: none; width: 100%;">
+                <div class="members-label">Thành viên:</div>
+                
+                <div class="member-buttons">
+                    <button class="btn-add-member" onclick="openAddMemberModal()"> Thêm sinh viên</button>
+                    <button class="btn-delete-member" onclick="openDeleteMemberModal()"> Xóa sinh viên</button>
+                </div>
+                
+                <table id="membersTable">
+                    <thead>
+                        <tr>
+                            <th>Họ và tên SV</th>
+                            <th>Mã SV</th>
+                            <th>Giường</th>
+                            <th>Hóa đơn</th>
+                            <th>Thông tin SV</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
             </div>
 
         </div>
     </div>
 
-    <!-- Modal thêm sinh viên -->
-    <div id="addMemberModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">Thêm sinh viên</div>
-            <input type="text" id="studentCode" class="modal-input" placeholder="Mã sinh viên (VD: N23DCVT003)">
-            <input type="text" id="studentName" class="modal-input" placeholder="Tên sinh viên (VD: Nguyen Van C)">
-            <input type="text" id="bedNumber" class="modal-input" placeholder="Giường (VD: G7)">
-            <div class="modal-buttons">
-                <button class="modal-btn modal-btn-cancel" onclick="closeAddMemberModal()">Hủy</button>
-                <button class="modal-btn modal-btn-add" onclick="addMember()">Thêm</button>
+    <!-- Modal Chỉnh sửa (Thêm/Xóa sinh viên) -->
+    <div id="editMemberModal" class="modal">
+        <div class="modal-content edit-modal-content">
+            <div class="modal-header">Chỉnh sửa thành viên phòng</div>
+            
+            <div class="edit-tabs">
+                <button class="edit-tab-btn active" onclick="switchTab('add')"> Thêm sinh viên</button>
+                <button class="edit-tab-btn" onclick="switchTab('delete')"> Xóa sinh viên</button>
             </div>
-        </div>
-    </div>
 
-    <!-- Modal xóa sinh viên -->
-    <div id="deleteMemberModal" class="modal">
-        <div class="modal-content" style="width: 450px;">
-            <div class="modal-header">Chọn sinh viên để xóa</div>
-            <div id="deleteCheckboxList" style="max-height: 300px; overflow-y: auto; border: 1px solid #ffcccc; border-radius: 5px; padding: 10px; margin-bottom: 15px;">
+            <!-- Tab Thêm sinh viên -->
+            <div id="add-tab" class="tab-content active">
+                <div class="add-member-section">
+                    <label for="roomSelect">Phòng:</label>
+                    <select id="roomSelect">
+                        <option value="A1">Phòng A1</option>
+                        <option value="A2">Phòng A2</option>
+                        <option value="B1">Phòng B1</option>
+                        <option value="B2">Phòng B2</option>
+                    </select>
+                    <input type="text" id="studentName" class="modal-input" placeholder="Họ và tên sinh viên">
+                    <input type="text" id="studentCode" class="modal-input" placeholder="Mã sinh viên (VD: N23DCVT001)">
+                    <input type="text" id="bedNumber" class="modal-input" placeholder="Giường (VD: G7)">
+                    <div class="modal-buttons" style="margin-top: 15px;">
+                        <button class="modal-btn modal-btn-cancel" onclick="clearAddForm()">Xóa trắng</button>
+                        <button class="modal-btn modal-btn-add" onclick="addMember()">Thêm sinh viên</button>
+                    </div>
+                </div>
             </div>
-            <div class="modal-buttons">
-                <button class="modal-btn modal-btn-cancel" onclick="closeDeleteMemberModal()">Hủy</button>
-                <button class="modal-btn modal-btn-add" onclick="deleteSelectedMembers()">Xóa đã chọn</button>
+
+            <!-- Tab Xóa sinh viên -->
+            <div id="delete-tab" class="tab-content">
+                <div class="delete-member-section">
+                    <div id="deleteCheckboxList" class="delete-member-list">
+                    </div>
+                    <div class="modal-buttons" style="margin-top: 15px;">
+                        <button class="modal-btn modal-btn-cancel" onclick="closeEditMemberModal()">Hủy</button>
+                        <button class="modal-btn modal-btn-add" onclick="deleteSelectedMembers()">Xóa đã chọn</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -366,108 +505,231 @@
     <script>
         // Dữ liệu phòng mặc định
         const defaultRoomsData = {
-            'J01': {
+            'A1': {
                 members: [
-                    { code: 'N23DCVT001', name: 'Nguyen Van A', bed: 'G5' },
-                    { code: 'N23DCVT002', name: 'Nguyen Van B', bed: 'G6' }
+                    { code: 'N23DCVT001', name: 'Nguyen Van A', bed: 'G1' },
+                    { code: 'N23DCVT002', name: 'Nguyen Van B', bed: 'G2' }
                 ]
             },
-            'J02': {
+            'A2': {
                 members: [
-                    { code: 'N23DCVT003', name: 'Nguyen Van C', bed: 'G7' },
-                    { code: 'N23DCVT004', name: 'Nguyen Van D', bed: 'G8' }
+                    { code: 'N23DCVT003', name: 'Nguyen Van C', bed: 'G3' },
+                    { code: 'N23DCVT004', name: 'Nguyen Van D', bed: 'G4' }
+                ]
+            },
+            'B1': {
+                members: [
+                    { code: 'N23DCVT005', name: 'Nguyen Van E', bed: 'G5' }
+                ]
+            },
+            'B2': {
+                members: [
+                    { code: 'N23DCVT006', name: 'Nguyen Van F', bed: 'G6' }
                 ]
             }
         };
 
-        // Tải roomsData từ localStorage hoặc dùng dữ liệu mặc định
         let roomsData = getRoomsDataFromStorage();
+        let currentRoom = 'A1';
+        let isOverviewMode = false;
 
         function getRoomsDataFromStorage() {
             const stored = localStorage.getItem('roomsData');
+            let data;
             if (stored) {
-                return JSON.parse(stored);
+                data = JSON.parse(stored);
+            } else {
+                data = JSON.parse(JSON.stringify(defaultRoomsData));
             }
-            return defaultRoomsData;
+            
+            // Đảm bảo tất cả các phòng đều tồn tại
+            if (!data['A1']) data['A1'] = { members: [] };
+            if (!data['A2']) data['A2'] = { members: [] };
+            if (!data['B1']) data['B1'] = { members: [] };
+            if (!data['B2']) data['B2'] = { members: [] };
+            
+            return data;
         }
 
-        // Lưu roomsData vào localStorage
         function saveRoomsDataToStorage() {
             localStorage.setItem('roomsData', JSON.stringify(roomsData));
         }
 
-        let currentRoom = '';
-
-        function loadRoom(room) {
-            currentRoom = room;
-            const memberLabel = document.getElementById("memberLabel");
-            const memberBox = document.getElementById("memberBox");
-            const utilityGrid = document.getElementById("utilityGrid");
-            const totalPrice = document.getElementById("totalPrice");
-            
-            if (room === '') {
-                // Ẩn tất cả khi chọn "----"
-                memberLabel.style.display = 'none';
-                memberBox.style.display = 'none';
-                utilityGrid.style.display = 'none';
-                totalPrice.style.display = 'none';
-                return;
+        function toggleSection(element) {
+            const subsection = element.nextElementSibling;
+            if (subsection && subsection.classList.contains('menu-subsection')) {
+                subsection.style.display = subsection.style.display === 'none' ? 'block' : 'none';
+                element.textContent = subsection.style.display === 'none' ? '▶ ' + element.textContent.slice(2) : '▼ ' + element.textContent.slice(2);
             }
+        }
+
+        function loadRoom(roomName) {
+            if (!roomName) return;
             
-            // Hiển thị khi chọn phòng
-            memberLabel.style.display = 'block';
-            memberBox.style.display = 'block';
-            utilityGrid.style.display = 'grid';
-            totalPrice.style.display = 'block';
+            isOverviewMode = false;
+            currentRoom = roomName;
+            document.getElementById('roomTitle').textContent = 'Phòng ' + roomName;
+            document.getElementById('searchEditWrapper').style.display = 'flex';
+            document.getElementById('overviewContainer').style.display = 'none';
+            document.getElementById('roomDetailContainer').style.display = 'block';
             
-            const roomData = roomsData[room];
-            const memberList = document.getElementById("memberList");
-            const roomTitle = document.querySelector('.room-title');
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
             
-            // Cập nhật tiêu đề
-            roomTitle.textContent = 'Thông tin phòng';
+            const roomData = roomsData[roomName];
+            if (roomData && roomData.members) {
+                roomData.members.forEach(member => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${member.name}</td>
+                        <td>${member.code}</td>
+                        <td>${member.bed}</td>
+                        <td><a href="#" class="link-see">xem</a></td>
+                        <td><a href="#" class="link-see">xem</a></td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+        }
+
+        function showOverview() {
+            isOverviewMode = true;
+            document.getElementById('roomTitle').textContent = '📋 Thông tin phòng';
+            document.getElementById('searchEditWrapper').style.display = 'none';
+            document.getElementById('overviewContainer').style.display = 'grid';
+            document.getElementById('roomDetailContainer').style.display = 'none';
+            document.getElementById('searchInput').value = '';
             
-            // Xóa các member cũ
-            memberList.innerHTML = '';
+            const overviewContainer = document.getElementById('overviewContainer');
+            overviewContainer.innerHTML = '';
             
-            // Thêm các member mới
-            roomData.members.forEach(member => {
-                const memberDiv = document.createElement('div');
-                memberDiv.className = 'member-item';
-                memberDiv.setAttribute('data-code', member.code);
-                memberDiv.setAttribute('data-name', member.name);
-                memberDiv.setAttribute('data-bed', member.bed);
-                memberDiv.textContent = member.name;
-                memberDiv.onclick = function() {
-                    handleMemberClick(member.code, member.name, room, member.bed, 'Đã đóng tiền');
+            const rooms = ['A1', 'A2', 'B1', 'B2'];
+            rooms.forEach(room => {
+                const roomData = roomsData[room];
+                const memberCount = roomData && roomData.members ? roomData.members.length : 0;
+                
+                const card = document.createElement('a');
+                card.href = '#';
+                card.className = 'room-card';
+                card.onclick = function(e) {
+                    e.preventDefault();
+                    loadRoom(room);
                 };
-                memberList.appendChild(memberDiv);
+                
+                card.innerHTML = `
+                    <div class="room-card-title">Phòng ${room}</div>
+                    <div class="room-card-info">Số sinh viên: <strong>${memberCount}</strong></div>
+                    <div class="room-card-info">Khu: <strong>${room[0] === 'A' ? 'Khu A' : 'Khu B'}</strong></div>
+                `;
+                
+                overviewContainer.appendChild(card);
             });
         }
 
-        function openAddMemberModal() {
-            document.getElementById("addMemberModal").style.display = "block";
-            document.getElementById("studentCode").value = "";
-            document.getElementById("studentName").value = "";
-            document.getElementById("bedNumber").value = "";
+        function filterTable() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById('membersTable');
+            const tr = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < tr.length; i++) {
+                const cells = tr[i].getElementsByTagName('td');
+                let found = false;
+                for (let j = 0; j < cells.length; j++) {
+                    if (cells[j].textContent.toLowerCase().indexOf(filter) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+                tr[i].style.display = found ? '' : 'none';
+            }
         }
 
-        function closeAddMemberModal() {
-            document.getElementById("addMemberModal").style.display = "none";
+        function openEditModal() {
+            document.getElementById('editMemberModal').style.display = 'block';
+            loadDeleteMembersList();
+            switchTab('add');
+            document.getElementById('roomSelect').value = currentRoom;
         }
 
-        function addMember() {
-            var code = document.getElementById("studentCode").value.trim();
-            var name = document.getElementById("studentName").value.trim();
-            var bed = document.getElementById("bedNumber").value.trim();
+        function closeEditMemberModal() {
+            document.getElementById('editMemberModal').style.display = 'none';
+        }
 
-            if (code === "" || name === "" || bed === "") {
-                alert("Vui lòng điền đầy đủ thông tin!");
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.edit-tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            if (tabName === 'add') {
+                document.getElementById('add-tab').classList.add('active');
+                document.querySelector('[onclick="switchTab(\'add\')"]').classList.add('active');
+                clearAddForm();
+            } else if (tabName === 'delete') {
+                document.getElementById('delete-tab').classList.add('active');
+                document.querySelector('[onclick="switchTab(\'delete\')"]').classList.add('active');
+                loadDeleteMembersList();
+            }
+        }
+
+        function loadDeleteMembersList() {
+            const roomData = roomsData[currentRoom];
+            const checkboxList = document.getElementById('deleteCheckboxList');
+            checkboxList.innerHTML = '';
+
+            if (!roomData || roomData.members.length === 0) {
+                checkboxList.innerHTML = '<p style="color: #ff3333; text-align: center;">Không có sinh viên để xóa</p>';
                 return;
             }
 
-            // Thêm vào data
-            roomsData[currentRoom].members.push({
+            roomData.members.forEach(member => {
+                const label = document.createElement('label');
+                label.innerHTML = `
+                    <input type="checkbox" value="${member.code}">
+                    <span>${member.name} (${member.code}) - Giường ${member.bed}</span>
+                `;
+                checkboxList.appendChild(label);
+            });
+        }
+
+        function clearAddForm() {
+            document.getElementById('studentName').value = '';
+            document.getElementById('studentCode').value = '';
+            document.getElementById('bedNumber').value = '';
+            document.getElementById('roomSelect').value = currentRoom;
+            document.getElementById('studentName').focus();
+        }
+
+        function addMember() {
+            const name = document.getElementById('studentName').value.trim();
+            const code = document.getElementById('studentCode').value.trim();
+            const bed = document.getElementById('bedNumber').value.trim();
+            const selectedRoom = document.getElementById('roomSelect').value;
+
+            if (name === '' || code === '' || bed === '') {
+                alert('Vui lòng điền đầy đủ thông tin!');
+                return;
+            }
+
+            // Kiểm tra xem phòng có tồn tại không
+            if (!roomsData[selectedRoom]) {
+                alert('Phòng không tồn tại!');
+                return;
+            }
+
+            // Kiểm tra mã sinh viên đã tồn tại chưa trong phòng được chọn
+            if (roomsData[selectedRoom].members.some(m => m.code === code)) {
+                alert('Mã sinh viên này đã tồn tại trong phòng ' + selectedRoom + '!');
+                return;
+            }
+
+            // Thêm vào dữ liệu phòng được chọn
+            roomsData[selectedRoom].members.push({
                 code: code,
                 name: name,
                 bed: bed
@@ -476,111 +738,53 @@
             // Lưu vào localStorage
             saveRoomsDataToStorage();
 
-            // Cập nhật hiển thị
-            loadRoom(currentRoom);
-            closeAddMemberModal();
+            // Cập nhật hiển thị nếu phòng được chọn là phòng hiện tại
+            if (selectedRoom === currentRoom) {
+                loadRoom(currentRoom);
+            }
+            
+            clearAddForm();
+            alert('Thêm sinh viên vào phòng ' + selectedRoom + ' thành công!');
         }
 
-        let deleteMode = false;
-
         function openDeleteMemberModal() {
-            var memberList = document.getElementById("memberList");
-            var memberItems = memberList.querySelectorAll(".member-item");
-            var checkboxList = document.getElementById("deleteCheckboxList");
-            
-            checkboxList.innerHTML = "";
-            
-            memberItems.forEach(item => {
-                var code = item.getAttribute("data-code");
-                var name = item.getAttribute("data-name");
-                
-                var label = document.createElement("label");
-                label.style.display = "flex";
-                label.style.alignItems = "center";
-                label.style.padding = "8px 0";
-                label.style.cursor = "pointer";
-                label.style.color = "#ff3333";
-                
-                var checkbox = document.createElement("input");
-                checkbox.type = "checkbox";
-                checkbox.value = code;
-                checkbox.style.marginRight = "10px";
-                checkbox.style.cursor = "pointer";
-                checkbox.style.width = "18px";
-                checkbox.style.height = "18px";
-                
-                var text = document.createElement("span");
-                text.textContent = name;
-                
-                label.appendChild(checkbox);
-                label.appendChild(text);
-                checkboxList.appendChild(label);
-            });
-            
-            document.getElementById("deleteMemberModal").style.display = "block";
+            // Hàm này không còn sử dụng - chuyển sang sử dụng modal chỉnh sửa
         }
 
         function closeDeleteMemberModal() {
-            document.getElementById("deleteMemberModal").style.display = "none";
+            // Hàm này không còn sử dụng - chuyển sang sử dụng modal chỉnh sửa
         }
 
         function deleteSelectedMembers() {
-            var checkboxes = document.querySelectorAll("#deleteCheckboxList input[type='checkbox']:checked");
-            
+            const checkboxes = document.querySelectorAll('#deleteCheckboxList input[type="checkbox"]:checked');
+
             if (checkboxes.length === 0) {
-                alert("Vui lòng chọn ít nhất một sinh viên để xóa!");
+                alert('Vui lòng chọn ít nhất một sinh viên để xóa!');
                 return;
             }
-            
-            if (confirm("Bạn có chắc muốn xóa " + checkboxes.length + " sinh viên?")) {
+
+            const selectedNames = Array.from(checkboxes).map(cb => {
+                const label = cb.closest('label');
+                return label.textContent.trim();
+            }).join('\n• ');
+
+            if (confirm('Bạn có chắc muốn xóa ' + checkboxes.length + ' sinh viên này?\n\n• ' + selectedNames)) {
                 checkboxes.forEach(checkbox => {
-                    var code = checkbox.value;
-                    // Xóa từ data
+                    const code = checkbox.value;
                     roomsData[currentRoom].members = roomsData[currentRoom].members.filter(m => m.code !== code);
                 });
-                
+
                 // Lưu vào localStorage
                 saveRoomsDataToStorage();
-                
+
                 // Cập nhật hiển thị
                 loadRoom(currentRoom);
-                closeDeleteMemberModal();
+                
+                // Làm mới danh sách checkbox
+                loadDeleteMembersList();
+                
+                alert('Xóa ' + checkboxes.length + ' sinh viên thành công!');
             }
-        }
-
-        function handleMemberClick(code, name, room, bed, status) {
-            viewProfile(code, name, room, bed, status);
-        }
-
-        function removeMember(event) {
-            event.stopPropagation();
-            var memberItem = event.target.closest(".member-item");
-            var memberName = memberItem.getAttribute("data-name");
-            
-            if (confirm("Bạn có chắc muốn xóa " + memberName + " khỏi phòng?")) {
-                memberItem.remove();
-            }
-        }
-
-        // Nút X để đóng modal khi click vào background
-        window.onclick = function(event) {
-            var modal = document.getElementById("addMemberModal");
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-        }
-
-        function viewProfile(code, name, room, bed, status) {
-            // Lưu thông tin vào localStorage để truyền sang profile.html
-            localStorage.setItem('profileData', JSON.stringify({
-                code: code,
-                name: name,
-                room: room,
-                bed: bed,
-                status: status
-            }));
-            // Chuyển sang trang profile.html
-            window.location.href = "profile.html";
         }
 
         function toggleSidebar() {
@@ -589,42 +793,69 @@
             updateActivityTime();
         }
 
-        // Kiểm tra session khi trang load
+        function showOverviewHandler(event) {
+            event.preventDefault();
+            showOverview();
+        }
+
+        // Khởi tạo khi trang load
         window.addEventListener('load', function() {
             if (!validateSession()) {
                 window.location.href = 'index.html';
             }
-            // Lắng nghe sự kiện người dùng tương tác để update activity time
+            
+            // Kiểm tra xem có yêu cầu view=overview không
+            const urlParams = new URLSearchParams(window.location.search);
+            const viewMode = urlParams.get('view');
+            
+            if (viewMode === 'overview') {
+                showOverview();
+            } else {
+                loadRoom('A1');
+            }
+            
+            // Thêm event listener cho các menu items
+            const roomLinks = document.querySelectorAll('[data-room]');
+            roomLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const room = this.getAttribute('data-room');
+                    loadRoom(room);
+                });
+            });
+            
             document.addEventListener('click', updateActivityTime);
             document.addEventListener('keypress', updateActivityTime);
         });
 
-        // Hàm kiểm tra session hợp lệ
+        // Đóng modal khi click vào background
+        window.onclick = function(event) {
+            const editModal = document.getElementById('editMemberModal');
+            if (event.target === editModal) {
+                editModal.style.display = 'none';
+            }
+        }
+
         function validateSession() {
             const sessionToken = localStorage.getItem('sessionToken');
             const sessionLastActivity = localStorage.getItem('sessionLastActivity');
             
-            // Nếu không có session -> không hợp lệ
             if (!sessionToken) {
                 return false;
             }
             
-            // Kiểm tra timeout (5 phút = 300000 ms)
             const currentTime = Date.now();
             const lastActivityTime = parseInt(sessionLastActivity);
-            const timeoutDuration = 5 * 60 * 1000; // 5 phút
+            const timeoutDuration = 5 * 60 * 1000;
             
             if (currentTime - lastActivityTime > timeoutDuration) {
-                // Session expired -> xóa session
                 logout();
                 return false;
             }
             
-            // Session còn hợp lệ
             return true;
         }
 
-        // Hàm update activity time (khi user có tương tác)
         function updateActivityTime() {
             const sessionToken = localStorage.getItem('sessionToken');
             if (sessionToken) {
@@ -632,7 +863,6 @@
             }
         }
 
-        // Xóa session khi logout
         function logout() {
             localStorage.removeItem('sessionToken');
             localStorage.removeItem('sessionUsername');
