@@ -103,6 +103,20 @@
             background-color: #cc0000;
         }
 
+        .back-btn-top {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            margin-left: auto;
+        }
+
+        .back-btn-top:hover {
+            color: #ffcccc;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -407,6 +421,7 @@
 
     <div class="header">
         <div class="menu-icon" onclick="toggleSidebar()">☰</div>
+        <button id="backTopBtn" class="back-btn-top" onclick="goBack()">←</button>
     </div>
 
     <div class="container">
@@ -620,6 +635,9 @@
                     tableBody.appendChild(row);
                 });
             }
+            // Show back button when viewing room details
+            const backBtn = document.getElementById('backTopBtn');
+            if (backBtn) backBtn.style.display = '';
         }
 
         function showOverview() {
@@ -654,6 +672,10 @@
                 
                 overviewContainer.appendChild(card);
             });
+
+                // Hide back button in overview mode
+                const backBtn = document.getElementById('backTopBtn');
+                if (backBtn) backBtn.style.display = 'none';
         }
 
         function filterTable() {
@@ -698,21 +720,20 @@
                 if (!roomData || roomData.members.length === 0) return;
                 
                 roomData.members.forEach(member => {
-                    // Tách tên thành các từ riêng biệt
                     const name = member.name.toLowerCase().trim();
-                    
-                    // Split các từ (tách bằng khoảng trắng)
-                    const nameWords = name.split(/\s+/).filter(w => w.length > 0);
                     
                     let isMatch = false;
                     
-                    // Kiểm tra xem chuỗi tìm kiếm khớp với bắt đầu của bất kỳ từ nào trong tên
-                    for (let word of nameWords) {
-                        if (word.startsWith(filter)) {
-                            isMatch = true;
-                            break;
-                        }
-                    }
+                    // Tách từ khóa tìm kiếm thành các từ
+                    const searchWords = filter.split(/\s+/).filter(w => w.length > 0);
+                    
+                    // Tách tên thành các từ
+                    const nameWords = name.split(/\s+/).filter(w => w.length > 0);
+                    
+                    // Kiểm tra: tất cả các từ tìm kiếm phải khớp với bắt đầu của các từ trong tên
+                    isMatch = searchWords.every(searchWord => {
+                        return nameWords.some(nameWord => nameWord.startsWith(searchWord));
+                    });
                     
                     if (isMatch) {
                         const row = document.createElement('tr');
@@ -975,6 +996,10 @@
             if (sessionToken) {
                 localStorage.setItem('sessionLastActivity', Date.now());
             }
+        }
+
+        function goBack() {
+            window.history.back();
         }
 
         function logout() {
